@@ -16,10 +16,15 @@ import java.util.List;
 @RequestMapping("/categorias")
 public class CategoriaResource {
 
+
+    private CategoriaService categoriaService;
+    private ApplicationEventPublisher applicationEventPublisher;
+
     @Autowired
-    CategoriaService categoriaService;
-    @Autowired
-    ApplicationEventPublisher applicationEventPublisher;
+    public CategoriaResource(CategoriaService categoriaService, ApplicationEventPublisher applicationEventPublisher) {
+        this.categoriaService = categoriaService;
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
     @GetMapping
     public ResponseEntity<List<Categoria>> listar(){
@@ -35,6 +40,7 @@ public class CategoriaResource {
     public ResponseEntity<Categoria> salvar(@RequestBody @Valid Categoria categoria, HttpServletResponse response){
         Categoria categoriaSalva = categoriaService.salvar(categoria);
         applicationEventPublisher.publishEvent(new RecursoCriadoEvent(this, categoria.getCodigo(), response));
+
         return ResponseEntity.status(HttpStatus.CREATED).body(categoriaSalva);
     }
 
